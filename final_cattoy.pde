@@ -1,3 +1,4 @@
+//import twitter4j library
 import twitter4j.conf.*;
 import twitter4j.*;
 import twitter4j.auth.*;
@@ -8,10 +9,13 @@ import processing.serial.*;
 
 PImage img;
 PImage img2;
+
 Twitter twitter;
+
 Serial myPort;
 float val;
 String touchValues = null;
+
 File file = new File("/Users/yuening/Desktop/final_cattoy/kiwi_p.jpg");
 
 //String myText="";
