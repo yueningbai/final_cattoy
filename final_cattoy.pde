@@ -5,8 +5,10 @@ import twitter4j.auth.*;
 import twitter4j.api.*;
 import java.util.*;
 
+import processing.video.*;
 import processing.serial.*;
 
+Capture cam;
 PImage img;
 PImage img2;
 
@@ -16,29 +18,34 @@ Serial myPort;
 float val;
 String touchValues = null;
 
-File file = new File("/Users/yuening/Desktop/final_cattoy/kiwi_p.jpg");
+
 
 //String myText="";
 
 void setup() {
   size(800, 800);
+  frameRate(60);
+  String[] cameras = Capture.list();
+  cam = new Capture(this, cameras[0]);
+  cam.start();  
+  
   
   //twitter key
   ConfigurationBuilder cb = new ConfigurationBuilder();
   cb.setOAuthConsumerKey("H42As6tufJLUrOLsxY1RjYMjK");
   cb.setOAuthConsumerSecret("EvJMFEU3jLURopsB7uoJ3wCOKfY5FaVLlHU0qktASrpUqVjaEQ");
-  cb.setOAuthAccessToken("");
-  cb.setOAuthAccessTokenSecret("");
+  cb.setOAuthAccessToken("988873889043435521-mIn9iqlRDuZLZ0yz93E05uYUjBIdTJ6");
+  cb.setOAuthAccessTokenSecret("qMBRKDL0R3ukx3W5BtfcEaYZaStnqhFuA9AcC3TwpsOYl");
 
   TwitterFactory tf = new TwitterFactory(cb.build());
   twitter = tf.getInstance();
   
   //connect to the port
-  myPort = new Serial(this, "/dev/cu.usbmodem1461", 9600);
+
   myPort.bufferUntil('n');
   
-  img= loadImage("kiwi2.png");
-  img2= loadImage("gotya.png");
+ // img= loadImage("kiwi2.png");
+  img2= loadImage("/Users/yuening/Desktop/final_cattoy/cat_"+frameCount+".jpg");
 }
 //void serialEvent (Serial myPort) {
 //  myText = myPort.readStringUntil('n');
@@ -46,6 +53,13 @@ void setup() {
 void draw() {
   background(0, 0, 0);
   
+    if (cam.available() == true) {
+    cam.read();
+  }
+  
+  image(cam,0,0);
+ 
+
   //read the sensor value
   if(myPort.available()>0){
     touchValues = myPort.readStringUntil('\n');
@@ -61,20 +75,29 @@ void draw() {
   }
   
 void sendTweet(){
-  if(val<200){
-    for(int i=0;i<500;i=i+1){
-      float r1 = random(5,700);
-      float r2 = random(-5,700);
+  if(val<30){
+    //image(cam,0,0);
+    //for(int i=0;i<500;i=i+1){
+     // float r1 = random(5,700);
+     // float r2 = random(-5,700);
       
-      image(img,r1,r2,img.width/2,img.height/2);
+      //image(cam,r1,r2,cam.width/2,cam.height/2);
+      myPort.write('0');
     }
     
-  }
-  if(val>200){
-    String randomTweet = "play with me!"+random(100);    
+  
+  if(val>30){
+    myPort.write('1');
+    String randomTweet = "play with me!"+random(100);
+    saveFrame("cat_###.jpg");
+    
+    img2= loadImage("/Users/yuening/Desktop/final_cattoy/cat_"+frameCount+".jpg");
+    File file = new File("/Users/yuening/Desktop/final_cattoy/cat_"+frameCount+".jpg");
     tweetPic(file, randomTweet);
+    println(frameCount);
 
-    image(img2,0,0);
+    //image(img2,0,0);
+    
     noLoop();
   }
 }
